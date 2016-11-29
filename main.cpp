@@ -46,13 +46,10 @@ int main(void)
 	auto *i4 = GC.newValue<int>(8);
 	auto *tmp = GC.newValue<Test>();
 
-	Point *p1 = new Point(i1, i2);
-	Point *p2 = new Point(i3, i4);
-	Point *p3 = new Point(i1, i2);
+	Point *p1 = GC.newObject<Point>(i1, i2);
+	Point *p2 = GC.newObject<Point>(i3, i4);
+	Point *p3 = GC.newObject<Point>(i1, i2);
 
-	GC.addObject(p1);
-	GC.addObject(p2);
-	GC.addObject(p3);
 	GC.addRoot(p1);
 	GC.addRoot(p2);
 

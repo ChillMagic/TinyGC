@@ -82,17 +82,26 @@ namespace TinyGC
 			addObject(p);
 			return p;
 		}
-		GCObject* addObject(GCObject *p) {
-			GCObjectList.push_back(p);
+		template <typename T, typename... Args>
+		T* newObject(Args... args) {
+			T *p = new T(args...);
+			addObject(p);
 			return p;
 		}
 		void addRoot(GCObject *p) {
 			Root.add(p);
 		}
+		void removeRoot(GCObject *p) {
+			Root.remove(p);
+		}
 
 	private:
 		std::list<GCObject*> GCObjectList;
 		GCObjectRefList Root;
+
+		void addObject(GCObject *p) {
+			GCObjectList.push_back(p);
+		}
 
 		void mark();
 		void sweep();
