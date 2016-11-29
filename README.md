@@ -7,6 +7,7 @@
 - 准确式GC
 - 可控的垃圾回收
 - 不独占内存，与其他内存管理方式兼容
+- 允许拥有多个GC实例
 
 ## 使用方法
 
@@ -37,8 +38,6 @@ Point p = new Point(5, 6);
 C++ with TinyGC 代码：
 
 ```C++
-TinyGC::GC GC;
-
 class Point : public TinyGC::GCObject
 {
     using Int = TinyGC::GCValue<int>*;
@@ -55,11 +54,24 @@ private:
     }
 }
 
-Point *p = GC.newObject<Point>(
-    GC.newValue<int>(5),
-    GC.newValue<int>(6)
-);
+int main()
+{
+    TinyGC::GC GC;
+
+    Point *p = GC.newObject<Point>(
+        GC.newValue<int>(5),
+        GC.newValue<int>(6)
+    );
+
+    GC.collect(); // 进行GC，注意此后p是悬空的。
+}
 ```
+
+# 备注
+
+- 对于TinyGC来说，GC.newValue 和 GC.newObject 是**唯一**正确的创建可回收对象的方式。
+- 资源是由GC对象独占的， TinyGC::GC 相当于高级别的 std::unique_ptr 指针组。
+- Tiny::GC 对象会在生命周期结束后自动回收所有对象，因此可在其他类的内部建立GC对象，用于管理类内的可回收资源。
 
 ## 许可
 

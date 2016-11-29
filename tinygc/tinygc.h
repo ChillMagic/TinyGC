@@ -73,6 +73,9 @@ namespace TinyGC
 	{
 	public:
 		GC() {}
+		~GC() {
+			sweep();
+		}
 
 		void collect();
 
