@@ -67,7 +67,7 @@ int main()
 }
 ```
 
-# 备注
+## 备注
 
 - 对于TinyGC来说，GC.newValue 和 GC.newObject 是**唯一**正确的创建可回收对象的方式。
 - 资源是由GC对象独占的， TinyGC::GC 相当于高级别的 std::unique_ptr 指针组。
