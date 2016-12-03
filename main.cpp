@@ -69,7 +69,14 @@ int main(void)
 	Point *p2 = GC.newObject<Point>(i3, i4);
 	Point *p3 = GC.newObject<Point>(i1, i2);
 
-	TinyGC::GCRootPtr<DoublePoint> dp = GC.addRoot(GC.newObject<DoublePoint>(p1, p2));
+	DoublePoint *dp = GC.newObject<DoublePoint>(p1, p2);
+
+	GC.addRoot(dp);
+
+	{
+		TinyGC::GCRootPtr<DoublePoint> tdp = GC.getRootPtr(GC.newObject<DoublePoint>(p1, p2));
+		TinyGC::GCRootPtr<DoublePoint> tdp2 = tdp;
+	}
 
 	println(p1->to_string());
 	println(p2->to_string());

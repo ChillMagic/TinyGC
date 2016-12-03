@@ -16,7 +16,8 @@
 3. 使用 newObject 方法 创建相关的可回收的**含有**可回收对象的引用对象。
 4. 使用 addRoot 方法 将**不可回收的对象**加入Root中。
 5. 使用 removeRoot 方法 将**可回收的对象**从Root中移除。
-6. 使用 collect 方法 进行垃圾回收。
+6. 使用 getRootPtr 方法 获取 **可共享**的、生命周期结束后**自动removeRoot** 的 GCRootPtr **智能指针**。
+7. 使用 collect 方法 进行垃圾回收。
 
 ### 示例
 
@@ -72,6 +73,8 @@ int main()
 - 对于TinyGC来说，GC.newValue 和 GC.newObject 是**唯一**正确的创建可回收对象的方式。
 - 资源是由GC对象独占的， TinyGC::GC 相当于高级别的 std::unique_ptr 指针组。
 - Tiny::GC 对象会在生命周期结束后自动回收所有对象，因此可在其他类的内部建立GC对象，用于管理类内的可回收资源。
+- GC.getRootPtr 方法会返回一个基于**引用计数**的，生命周期结束后 removeRoot 的 GCRootPtr 智能指针。
+- 使用 GCRootPtr 相对于普通的引用计数的优点在于，该对象所引用的一切对象的共享都是不产生额外消耗的（单纯复制指针），并且不会产生 循环引用无法回收 等问题。
 
 ## 许可
 
