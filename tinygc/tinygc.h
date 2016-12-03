@@ -67,6 +67,33 @@ namespace TinyGC
 		void GCMark();
 	};
 
+	class GC;
+
+	//===================================
+	// * Class GCObjectRefList
+	//===================================
+	template <typename _GCTy = GCObject>
+	class GCRootPtr
+	{
+	public:
+		GCRootPtr(_GCTy *ptr, GC *master)
+			: ptr(ptr), master(master) {}
+		~GCRootPtr() {
+			this->master->removeRoot(this->ptr);
+		}
+
+		_GCTy* get() { return ptr; }
+		const _GCTy* get() const { return ptr; }
+		_GCTy* operator->() { return ptr; }
+		const _GCTy* operator->() const { return ptr; }
+		_GCTy& operator*() { return *ptr; }
+		const _GCTy& operator*() const { return *ptr; }
+
+	private:
+		_GCTy *ptr;
+		GC *master;
+	};
+
 	//===================================
 	// * Class GC
 	//===================================
@@ -92,15 +119,12 @@ namespace TinyGC
 			addObject(p);
 			return p;
 		}
-		void addRoot(GCObject *p) {
+		template <typename _GCTy>
+		GCRootPtr<_GCTy> addRoot(_GCTy *p) {
 			mtx.lock();
 			Root.add(p);
 			mtx.unlock();
-		}
-		void removeRoot(GCObject *p) {
-			mtx.lock();
-			Root.remove(p);
-			mtx.unlock();
+			return GCRootPtr<_GCTy>(p, this);
 		}
 
 	private:
@@ -114,6 +138,14 @@ namespace TinyGC
 
 		void mark();
 		void sweep();
+
+		template <typename _GCTy> friend class GCRootPtr;
+
+		void removeRoot(GCObject *p) {
+			mtx.lock();
+			Root.remove(p);
+			mtx.unlock();
+		}
 	};
 }
 
