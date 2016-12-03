@@ -17,8 +17,10 @@ namespace TinyGC
 	}
 
 	void GC::collect() {
+		mtx.lock();
 		mark();
 		sweep();
+		mtx.unlock();
 	}
 
 	void GC::mark() {

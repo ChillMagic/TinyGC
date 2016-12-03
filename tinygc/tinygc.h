@@ -2,6 +2,7 @@
 #define _TINYGC_H_
 #include <set>
 #include <list>
+#include <mutex>
 
 namespace TinyGC
 {
@@ -92,15 +93,20 @@ namespace TinyGC
 			return p;
 		}
 		void addRoot(GCObject *p) {
+			mtx.lock();
 			Root.add(p);
+			mtx.unlock();
 		}
 		void removeRoot(GCObject *p) {
+			mtx.lock();
 			Root.remove(p);
+			mtx.unlock();
 		}
 
 	private:
 		std::list<GCObject*> GCObjectList;
 		GCObjectRefList Root;
+		std::mutex mtx;
 
 		void addObject(GCObject *p) {
 			GCObjectList.push_back(p);
