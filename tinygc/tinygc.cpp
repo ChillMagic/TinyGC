@@ -5,20 +5,20 @@ namespace TinyGC
 	void GC::mark() {
 		for(auto iter = observers.begin(), end = observers.end(); iter != end; ){
 			auto root_pp = iter->get();
-			if(root_pp != nullptr) {
+			if(root_pp != nullptr) {  // if false, observer invalidated
 				auto root = root_pp->ptr;
-				if(root != nullptr) {
+				if(root != nullptr) {  // if false, GCRootPtr is null
 					root->GCMark();
 				}
 				++iter;
-			} else { // the observed GCRootPtr has been destructed, destruct observer
+			} else { // remove invalidated observer
 				iter = observers.erase(iter);
 			}
 		}
 	}
 
 	void GC::sweep() {
-		GCObject* newObjectHead = nullptr;
+		GCObject* newObjectHead = nullptr; // Linked list of not collected Objects
 		GCObject* next;
 		for(GCObject* p = objectHead; p != nullptr; p = next){
 			next = p->_Next;

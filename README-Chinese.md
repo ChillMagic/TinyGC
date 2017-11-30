@@ -46,7 +46,7 @@ public:
     Int x, y;
 
 private:
-    void GCMarkAllSub() {
+    void GCMarkAllSub() override {
         GCMarkSub(x);
         GCMarkSub(y);
     }

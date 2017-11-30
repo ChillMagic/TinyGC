@@ -19,6 +19,10 @@ namespace TinyGC
 		class GCRootObserver;
 	}
 
+
+	//===================================
+	// * Type checking macros
+	//===================================
 #define CHECK_POINTER_CONVERTIBLE(From, To) \
 	static_assert(std::is_convertible<From*, To*>::value, \
 				"Invalid pointer conversion from "#From"* to "#To"*")
@@ -64,7 +68,7 @@ namespace TinyGC
 	class GCValue : public GCObject
 	{
 	public:
-		GCValue() = default;
+		//GCValue() = default;  // can't compile in MSVC, but OK in GCC
 		~GCValue() = default;
 
 		template <typename... Args>

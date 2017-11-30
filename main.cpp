@@ -21,7 +21,7 @@ struct Point : public TinyGC::GCObject
 	TinyGC::GCValue<int> *x, *y;
 
 protected:
-	void GCMarkAllSub() {
+	void GCMarkAllSub() override {
 		GCMarkSub(x);
 		GCMarkSub(y);
 	}
@@ -42,7 +42,7 @@ struct DoublePoint : public TinyGC::GCObject
 	Point *p0, *p1;
 
 protected:
-	void GCMarkAllSub() {
+	void GCMarkAllSub() override {
 		GCMarkSub(p0);
 		GCMarkSub(p1);
 	}
@@ -63,7 +63,7 @@ struct AnotherDoublePoint : public Point
 	Point *p1;
 
 protected:
-	void GCMarkAllSub() {
+	void GCMarkAllSub() override {
 		Point::GCMarkAllSub();
 		GCMarkSub(p1);
 	}
