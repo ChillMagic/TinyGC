@@ -1,27 +1,24 @@
 # TinyGC
 
-基于 **标记·清除** 算法，配合C++的 **轻量级GC**（使用C++11）
+A **light-weighted GC** in C++ (C++11) based on **mark-and-sweep** algorithm.
 
-## 特征
+## Features
 
-- 准确式GC
-- 可控的垃圾回收
-- 不独占内存（内存占用小），与其他内存管理方式兼容
-- 允许拥有多个GC实例
+- Accurate GC
+- Controllable collection
+- Low memory consumption, compatible with other memory managements 
+- Allow multiple instances of GC
 
-## 使用方法
+## Use
 
-1. 创建 TinyGC::GC 对象。
-2. 使用 newValue 方法 创建相关的可回收的**不含**可回收对象的引用的对象。
-3. 使用 newObject 方法 创建相关的可回收的**含有**可回收对象的引用对象。
-4. 使用 addRoot 方法 将**不可回收的对象**加入Root中。
-5. 使用 removeRoot 方法 将**可回收的对象**从Root中移除。
-6. 使用 getRootPtr 方法 获取 **可共享**的、生命周期结束后**自动removeRoot** 的 GCRootPtr **智能指针**。
-7. 使用 collect 方法 进行垃圾回收。
+1. Create `TinyGC::GC` object.
+2. Call `newValue` method to create collectable object.
+3. Call `newObject` method to create collectable object whose type is a subclass of `GCObject`.
+4. Call `collect` to collect garbage.
 
-### 示例
+### Examples
 
-Java 代码：
+Java:
 
 ```Java
 class Point
@@ -36,7 +33,7 @@ class Point
 Point p = new Point(5, 6);
 ```
 
-C++ with TinyGC 代码：
+C++ with TinyGC:
 
 ```C++
 class Point : public TinyGC::GCObject
@@ -49,33 +46,33 @@ public:
     Int x, y;
 
 private:
-    void GCMarkSub() {
-        x->GCMark();
-        y->GCMark();
+    void GCMarkAllSub() {
+        GCMarkSub(x);
+        GCMarkSub(y);
     }
 }
 
 int main()
 {
     TinyGC::GC GC;
-
-    Point *p = GC.newObject<Point>(
-        GC.newValue<int>(5),
-        GC.newValue<int>(6)
-    );
-
-    GC.collect(); // 进行GC，注意此后p是悬空的。
+    {
+        auto p = GC.newObject<Point>(
+            GC.newValue<int>(5),
+            GC.newValue<int>(6)
+        );
+    }
+    GC.collect();
 }
 ```
 
-## 备注
+## Note
 
-- 对于TinyGC来说，GC.newValue 和 GC.newObject 是**唯一**正确的创建可回收对象的方式。
-- 资源是由GC对象独占的， TinyGC::GC 相当于高级别的 std::unique_ptr 指针组。
-- Tiny::GC 对象会在生命周期结束后自动回收所有对象，因此可在其他类的内部建立GC对象，用于管理类内的可回收资源。
-- GC.getRootPtr 方法会返回一个基于**引用计数**的，生命周期结束后 removeRoot 的 GCRootPtr 智能指针。
-- 使用 GCRootPtr 相对于普通的引用计数的优点在于，该对象所引用的一切对象的共享都是不产生额外消耗的（单纯复制指针），并且不会产生 循环引用无法回收 等问题。
+- For TinyGC, `GC::newValue` and `GC::newObject` is the **only** correct way to create collectable objects��
+- All the objects allocated by `GC` are owned by the `GC` object.
+- `GC` will release all resources once go out of scope, therefore can be used within a function, as a non-static menber of class or as thread local.
+- `GC::newValue` and `GC::newObject` returns a `GCRootPtr` smart pointer that would guarantee the object it points to will not be collected.
 
-## 许可
 
-Apache Licene 2.0
+## License
+
+Apache License 2.0
